@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PersonalPocket — Privacy Policy</title>
+<style>
+  :root { color-scheme: light; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+    line-height: 1.6;
+    color: #11181C;
+    background: #F9FAF9;
+  }
+  h1 { color: #0A4250; }
+  h2 { color: #0A4250; margin-top: 2.2em; }
+  .updated { color: #868E96; font-size: 0.9em; }
+  code { background: #F1F3F5; padding: 2px 6px; border-radius: 4px; }
+  a { color: #1B6C7D; }
+  ul { padding-left: 1.3em; }
+</style>
+</head>
+<body>
+<h1>Privacy Policy for PersonalPocket</h1>
+<p class="updated">Last updated: October 3, 2026</p>
+
+<p>PersonalPocket ("the app") is an on-device personal finance vault built to keep your
+credentials, banking, investment, and loan records private. This policy explains what
+happens to your data in plain terms.</p>
+
+<h2>Summary</h2>
+<ul>
+  <li>PersonalPocket does <strong>not</strong> have a backend server for your data.</li>
+  <li>Your records never leave your device. Nothing is uploaded, synced, or transmitted
+      to us, to banks, to brokers, or to any analytics or advertising service.</li>
+  <li>We do not collect, see, sell, or share your personal information, because we never
+      receive it in the first place.</li>
+</ul>
+
+<h2>What data the app stores, and where</h2>
+<p>All records you add (credentials, banking details, investment and loan information)
+are encrypted on your device using a key derived from your PIN (PBKDF2 / AES, via
+industry-standard cryptography libraries) before they are written to storage. The
+encrypted data stays in the app's private storage area on your phone, and the
+decryption key material is held in your device's secure hardware-backed keystore
+(Android Keystore / iOS Keychain). We, the developer, have no access to this key or
+to your records.</p>
+
+<h2>Biometric authentication</h2>
+<p>If you enable fingerprint or face unlock, PersonalPocket uses your operating
+system's built-in biometric authentication APIs to verify your identity locally on
+the device. Your biometric data is managed entirely by the operating system and is
+never accessible to the app or transmitted anywhere.</p>
+
+<h2>Exporting your data</h2>
+<p>You may choose to export an encrypted backup of your vault using your device's
+native share sheet. This action is entirely user-initiated: the app does not export,
+upload, or transmit your data on its own, and the exported file goes only to the
+destination you pick (e.g., your own cloud drive, email, or local storage).</p>
+
+<h2>Permissions the app requests, and why</h2>
+<ul>
+  <li><strong>Biometric / Face ID</strong> — to unlock your vault without typing your PIN.</li>
+  <li><strong>File sharing</strong> — only when you explicitly choose to export a backup.</li>
+  <li><strong>Screenshot / screen-recording block</strong> — the app blocks screenshots of
+      your sensitive records as a privacy protection; this does not involve any data
+      leaving the device.</li>
+</ul>
+
+<h2>Third parties</h2>
+<p>PersonalPocket does not integrate any third-party analytics, advertising, or
+crash-reporting SDKs that transmit data off the device. The app includes no tracking
+of any kind.</p>
+
+<h2>Data deletion</h2>
+<p>You can permanently erase all vault data at any time from within the app
+("Wipe data"), or by uninstalling the app, which removes all app-associated storage
+from your device per standard OS behavior.</p>
+
+<h2>Children's privacy</h2>
+<p>PersonalPocket is a personal finance tool intended for general audiences and is not
+directed at children. We do not knowingly collect any information from children,
+because the app does not collect information from anyone.</p>
+
+<h2>Changes to this policy</h2>
+<p>If this policy changes, the "Last updated" date above will be revised and the new
+policy will be published at this same URL.</p>
+
+<h2>Contact</h2>
+<p>Questions about this policy can be sent to:
+<a href="mailto:umeshpkhiste@gmail.com">umeshpkhiste@gmail.com</a></p>
+
+</body>
+</html>

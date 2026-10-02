@@ -1,0 +1,190 @@
+{
+  "app_name": "PersonalPocket",
+  "personality": "1 iOS-Native Clean",
+  "personality_one_liner": "A calm, premium, and trust-critical vault that treats user data with extreme care, utilizing soft neutrals and deep teal accents to project security and stability.",
+  "color": {
+    "surface": "#F9FAF9",
+    "onSurface": "#11181C",
+    "surfaceSecondary": "#FFFFFF",
+    "onSurfaceSecondary": "#11181C",
+    "surfaceTertiary": "#F1F3F5",
+    "onSurfaceTertiary": "#495057",
+    "surfaceInverse": "#0D151C",
+    "onSurfaceInverse": "#FFFFFF",
+    "brand": "#0A4250",
+    "brandPrimary": "#0A4250",
+    "onBrandPrimary": "#FFFFFF",
+    "brandSecondary": "#1B6C7D",
+    "onBrandSecondary": "#FFFFFF",
+    "brandTertiary": "#E2EFF1",
+    "onBrandTertiary": "#0A4250",
+    "success": "#2B8A3E",
+    "onSuccess": "#FFFFFF",
+    "warning": "#E67700",
+    "onWarning": "#FFFFFF",
+    "error": "#C92A2A",
+    "onError": "#FFFFFF",
+    "info": "#0A4250",
+    "onInfo": "#FFFFFF",
+    "border": "#E9ECEF",
+    "borderStrong": "#CED4DA",
+    "divider": "#F1F3F5",
+    "muted": "#868E96",
+    "onBrand": "#FFFFFF"
+  },
+  "typography": {
+    "displayFontFamily": "Plus Jakarta Sans",
+    "textFontFamily": "Plus Jakarta Sans",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Generous vertical breathing room. Cards and list items should have clear separation without looking detached. Maintain strict 16pt outer horizontal margins.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": "1",
+  "navigation": "bottom_tabs",
+  "icon_set": "Ionicons",
+  "glassmorphism": {
+    "enabled": true,
+    "do's": [
+      "Use subtle glass effect on the bottom tab bar when content scrolls behind it.",
+      "Use glass effect for floating action buttons or sticky headers.",
+      "Apply glass blur to the PIN entry numpad over the textured background on the App Unlock screen."
+    ],
+    "dont's": [
+      "Do not use glass on standard list items, form fields, or primary content cards."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-blur",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "App Unlock",
+      "purpose": "Primary security gateway requiring biometric or PIN entry to access the vault.",
+      "states": {
+        "loading": "Subtle blur transition or lock icon resolving.",
+        "empty": "N/A",
+        "error": "Shake animation on numpad + haptic feedback for incorrect PIN."
+      },
+      "layout": "Full screen layout. Background image with a vertical gradient scrim (transparent to surface). Large centered lock or PersonalPocket logo, followed by a glassmorphic PIN pad and biometric prompt centered in the lower third. Secure, calm, minimal."
+    },
+    {
+      "name": "Credentials Vault (Home)",
+      "purpose": "List user's digital credentials (passwords, PINs).",
+      "states": {
+        "loading": "List skeleton with icon placeholders.",
+        "empty": "Centered empty state illustration with 'No credentials yet' and a prominent 'Add Credential' CTA.",
+        "error": "Error message with retry button."
+      },
+      "layout": "Sticky large header. Top search bar. Flat list of cards or unified list rows (12pt radius). Each row shows service logo (use image_selector_tool for real PNGs), service name, and user email. Do not show passwords in the list view. FAB for adding new items."
+    },
+    {
+      "name": "Banking Vault",
+      "purpose": "Organized view of Savings, FDs, RDs, and other deposits.",
+      "states": {
+        "loading": "Skeleton rows grouped by section.",
+        "empty": "Empty state illustration emphasizing financial security.",
+        "error": "Error message with retry button."
+      },
+      "layout": "Use sectioned lists or segmented controls to divide Savings, FDs, RDs. Cards show bank logo, account reference (masked partially), and balance. A summary header showing total safe value can be included but hidden behind a global 'reveal' eye icon."
+    },
+    {
+      "name": "Investments Vault",
+      "purpose": "Track Mutual funds, SIPs, SWPs, and market investments.",
+      "states": {
+        "loading": "Skeleton rows.",
+        "empty": "Empty state showing growth/investment illustration.",
+        "error": "Error message with retry button."
+      },
+      "layout": "Segmented by investment type. Clean rows showing provider logo, instrument name, and current value. Touch target to view detail screen."
+    },
+    {
+      "name": "Loans Vault",
+      "purpose": "Track Home, Vehicle, Personal, and Education loans.",
+      "states": {
+        "loading": "Skeleton rows.",
+        "empty": "Empty state illustration.",
+        "error": "Error message with retry button."
+      },
+      "layout": "Card layout per loan. Display lender logo, loan type, outstanding amount, and next EMI date. Visually distinguish from positive balances (e.g. muted text or specific warning/neutral tones, avoiding harsh reds unless overdue)."
+    },
+    {
+      "name": "Record Detail & Edit Forms",
+      "purpose": "View full details of a specific record or add/edit one.",
+      "states": {
+        "loading": "Form skeleton.",
+        "empty": "N/A",
+        "error": "Validation errors below respective fields."
+      },
+      "layout": "Single column form inside KeyboardAvoidingView. Labels above inputs. Sensitive fields (passwords, PINs) MUST be rendered as masked text (`••••••••`) by default, accompanied by a 'Reveal' icon toggle and a 'Copy' icon. Sticky primary CTA (Save/Update) fixed at bottom above home indicator."
+    },
+    {
+      "name": "More (Settings)",
+      "purpose": "App settings, security controls, and data management.",
+      "states": {
+        "loading": "N/A",
+        "empty": "N/A",
+        "error": "N/A"
+      },
+      "layout": "Grouped list rows for Auto-lock timing, Biometric toggle, Data Export, and 'Delete All Data' (destructive styling). Clean, native iOS settings feel."
+    }
+  ],
+  "images": {
+    "auth_background": {
+      "url": "https://images.unsplash.com/photo-1710162734106-6932b5799f99?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODR8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG1pbmltYWwlMjBzb2Z0JTIwbmV1dHJhbCUyMHRleHR1cmUlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc5MDk2NDM0NHww&ixlib=rb-4.1.0&q=85",
+      "dark": "https://images.unsplash.com/photo-1669295384050-a1d4357bd1d7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzl8MHwxfHNlYXJjaHwyfHxkYXJrJTIwdGVhbCUyMGFic3RyYWN0JTIwZ3JhZGllbnQlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc5MDk2NDM0NHww&ixlib=rb-4.1.0&q=85",
+      "alt": "Soft abstract neutral texture for unlock screen"
+    },
+    "empty_vault": {
+      "url": "https://images.unsplash.com/photo-1703583955173-0a5d6f697490?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxlbXB0eSUyMHNhZmUlMjB2YXVsdCUyMGlsbHVzdHJhdGlvbiUyMHNvZnQlMjBwYXN0ZWx8ZW58MHx8fHwxNzkwOTY0MzQ0fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Abstract secure vault illustration"
+    }
+  },
+  "haptics": {
+    "auth_pin_press": "light",
+    "auth_error": "heavy",
+    "reveal_secret": "medium",
+    "copy_secret": "success",
+    "tab_change": "light",
+    "save_record": "success",
+    "delete_confirm": "heavy"
+  },
+  "instructions_to_main_agent": [
+    "ZERO TOLERANCE: Never display passwords, MPINs, TPINs, or sensitive reference numbers in plain text by default. Always use a masked component with an explicit eye/reveal toggle.",
+    "Data Privacy: Ensure 'secureTextEntry' is utilized for secret form inputs. Avoid showing actual secrets in generic 'success' or log outputs.",
+    "Branded Entities: When rendering the sample data (banks, services, Netflix, Chase), use the 'image_selector_tool' to fetch real PNG logos. Use initials inside a brandTertiary circle ONLY if a logo is unfound.",
+    "Unlock Flow: The App Unlock screen is the root gateway. Make sure it intercepts entry. Use the provided abstract background with a glassmorphic numpad.",
+    "Forms: Form inputs should have clear labels. Place sticky Save/Submit buttons inside a fixed container at the bottom, handling KeyboardAvoidingView cleanly.",
+    "Colors: Strictly adhere to the provided deep teal (brand) and soft neutral (surface) palette. Avoid default indigos/blues. For Dark Mode, shift surfaces to deep dark teal-tinted charcoal (surface: #0D1112) with adapted brand accents (#42A5B8).",
+    "Layouts: Lists should have 16pt uniform padding. Use chips for selecting account types (e.g., Savings, FD, RD) inside the forms.",
+    "Apply all listed haptics consistently to tactile actions like PIN entry, masking toggles, and copying secrets."
+  ]
+}

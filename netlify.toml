@@ -1,0 +1,20 @@
+[build]
+  base = "frontend"
+  # Dependency install is handled by Netlify's own install step (it reads the
+  # "packageManager" field in package.json and uses yarn via corepack) — do
+  # not duplicate it here, or you'll get two conflicting installs.
+  command = "npx expo export --platform web"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Expo's web export otherwise tries to open a browser / prompt interactively.
+  CI = "true"
+  EXPO_NO_TELEMETRY = "1"
+
+# Expo Router web output is "single" (one SPA shell) — all client-side routes
+# must fall back to index.html so deep links and refreshes don't 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
