@@ -1,0 +1,10 @@
+# Not needed for the web build — speeds up Vercel's source upload.
+backend/
+store/
+memory/
+test_reports/
+tests/
+test_result.md
+design_guidelines.json
+DEPLOY_NETLIFY.md
+netlify.toml
