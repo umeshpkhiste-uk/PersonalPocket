@@ -1,9 +1,9 @@
 # Deploying PersonalPocket (web) to Vercel
 
-Same web export as the Netlify setup (`DEPLOY_NETLIFY.md`) — Expo Router's
-static SPA build (`web.output: "single"` in `frontend/app.json`), just wired
-for Vercel instead. Read the security note in `DEPLOY_NETLIFY.md` before
-sharing the link either way; it applies here too.
+PersonalPocket is a React Native/Expo app; Vercel hosts the **web export**
+(Expo Router's `web.output: "single"` → one static SPA bundle), not the
+native Android/iOS app. Use this for UI testing/previews only — see the
+security note at the bottom before treating it as anything more.
 
 ## What was added
 
@@ -53,3 +53,19 @@ no lockfile at the repo root for Vercel to auto-detect a package manager
 from (the repo root has no `package.json` at all — it only exists under
 `frontend/`). Spelling out `installCommand` avoids Vercel guessing wrong and
 installing with npm instead.
+
+## Security note — read before sharing the Vercel link
+
+On native (iOS/Android), your PIN-derived encryption key material (salt,
+verifier, biometric key) is stored in the OS Keychain/Keystore. **The web
+build has no Keychain** — `frontend/src/utils/storage/index.web.ts` falls
+back to browser `localStorage`/IndexedDB for everything, including that key
+material. The vault records are still AES-encrypted, but the web version is
+meaningfully less secure than the native app and should be treated as a
+UI/functional preview, not a place to store real financial data. Biometric
+unlock and screenshot-blocking are also disabled on web (they no-op rather
+than error).
+
+If you want the Vercel preview to be harder to stumble onto publicly, use
+Vercel's Deployment Protection (Project Settings → Deployment Protection)
+since `vercel.json` doesn't set that for you.

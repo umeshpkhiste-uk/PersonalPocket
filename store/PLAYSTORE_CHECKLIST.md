@@ -31,7 +31,7 @@ Design a real icon (teal brand palette — `#0A4250` / `#1B6C7D`, see
 ### 2. Host the privacy policy
 Play Console requires a **live public URL**, not a file. Options:
 - GitHub Pages (free): push `store/privacy-policy.html` to a repo, enable Pages.
-- Or any static host (Vercel, Netlify, your own domain).
+- Or Vercel (see `DEPLOY_VERCEL.md`) or any other static host/your own domain.
 Once hosted, put the URL into `store/store-listing.md` → Contact details, and
 into Play Console → App content → Privacy policy.
 
