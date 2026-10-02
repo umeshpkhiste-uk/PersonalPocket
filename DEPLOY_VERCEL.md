@@ -10,7 +10,7 @@ security note at the bottom before treating it as anything more.
 - `vercel.json` (repo root) — since there's no `package.json` at the repo
   root (only in `frontend/`), Vercel can't auto-detect the project without
   this file. It explicitly runs:
-  - `installCommand`: `cd frontend && yarn install`
+  - `installCommand`: `cd frontend && npm install`
   - `buildCommand`: `cd frontend && npx expo export --platform web`
   - `outputDirectory`: `frontend/dist`
   - a SPA rewrite (`/(.*)` → `/index.html`) — Vercel only falls back to this
@@ -18,6 +18,8 @@ security note at the bottom before treating it as anything more.
     (`_expo/static/...`, `favicon.ico`) are still served directly.
 - `.vercelignore` — excludes `backend/`, `store/`, and other non-web files
   from the upload, since the web build never touches them.
+- `frontend/package-lock.json` — committed so the Vercel install is
+  deterministic (see the note below on why npm instead of yarn).
 
 ## Steps
 
@@ -42,17 +44,23 @@ vercel --prod   # production deploy
 ### Test the export locally first (optional, catches failures before Vercel does)
 ```bash
 cd frontend
-yarn install   # or npm install
+npm install
 npx expo export --platform web
 npx serve dist
 ```
 
-## Why `yarn install` is spelled out explicitly
-`frontend/package.json` pins `"packageManager": "yarn@1.22.22"`, and there's
-no lockfile at the repo root for Vercel to auto-detect a package manager
-from (the repo root has no `package.json` at all — it only exists under
-`frontend/`). Spelling out `installCommand` avoids Vercel guessing wrong and
-installing with npm instead.
+## Why `npm install` instead of `yarn install`
+`frontend/package.json` pins `"packageManager": "yarn@1.22.22"`, which is
+what local dev and EAS Build use. The first Vercel deploy with
+`installCommand: cd frontend && yarn install` failed at the install step —
+most likely Vercel's build image not resolving the pinned Yarn version
+through corepack the way local `yarn install` does. Rather than debug
+Vercel's corepack behavior blind, this was switched to `npm install`
+(verified end-to-end locally: clean install → `expo export --platform web`
+→ correct `dist/` output) since npm needs no corepack step and is always
+present in Vercel's Node build image. `frontend/package-lock.json` is
+committed so this install is reproducible rather than re-resolving from
+scratch on every build.
 
 ## Security note — read before sharing the Vercel link
 
