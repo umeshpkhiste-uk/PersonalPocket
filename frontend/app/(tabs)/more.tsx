@@ -1,6 +1,6 @@
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { useState } from "react";
-import { Modal, Platform, Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { Platform, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ConfirmSheet } from "@/src/components/ConfirmSheet";
@@ -9,13 +9,6 @@ import { fonts } from "@/src/typography";
 import { makeStyles, useTheme } from "@/src/theme";
 import { useVault } from "@/src/vault/VaultContext";
 
-const AUTO_LOCK_OPTIONS = [
-  { label: "1 minute", value: 1 },
-  { label: "2 minutes", value: 2 },
-  { label: "5 minutes", value: 5 },
-  { label: "10 minutes", value: 10 },
-];
-
 export default function Settings() {
   const styles = useStyles();
   const { colors } = useTheme();
@@ -23,11 +16,7 @@ export default function Settings() {
   const toast = useToast();
   const { settings, biometricAvailable, updateSettings, lock, exportVault, wipeAll } = useVault();
 
-  const [lockPickerOpen, setLockPickerOpen] = useState(false);
   const [wipeConfirm, setWipeConfirm] = useState(false);
-
-  const autoLockLabel =
-    AUTO_LOCK_OPTIONS.find((o) => o.value === settings.autoLockMinutes)?.label ?? `${settings.autoLockMinutes} min`;
 
   const onExport = async () => {
     const res = await exportVault();
@@ -62,14 +51,6 @@ export default function Settings() {
               thumbColor={colors.surfaceSecondary}
             />
           </Row>
-          <Divider />
-          <Pressable style={styles.row} onPress={() => setLockPickerOpen(true)} testID="row-autolock">
-            <RowInner icon="time-outline" label="Auto-Lock" subtitle="Lock after inactivity" />
-            <View style={styles.valuePill}>
-              <Text style={styles.valueText}>{autoLockLabel}</Text>
-              <Ionicons name="chevron-forward" size={16} color={colors.muted} />
-            </View>
-          </Pressable>
           <Divider />
           <Row icon="eye-off-outline" label="Hide in Screenshots" subtitle="Blocks screen capture & previews">
             <Switch
@@ -109,31 +90,6 @@ export default function Settings() {
           </Text>
         </View>
       </ScrollView>
-
-      {/* Auto-lock picker */}
-      <Modal visible={lockPickerOpen} transparent animationType="fade" onRequestClose={() => setLockPickerOpen(false)}>
-        <Pressable style={styles.backdrop} onPress={() => setLockPickerOpen(false)} />
-        <View style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]}>
-          <View style={styles.handle} />
-          <Text style={styles.sheetTitle}>Auto-Lock Timer</Text>
-          {AUTO_LOCK_OPTIONS.map((o) => (
-            <Pressable
-              key={o.value}
-              style={styles.option}
-              onPress={() => {
-                updateSettings({ autoLockMinutes: o.value });
-                setLockPickerOpen(false);
-              }}
-              testID={`autolock-${o.value}`}
-            >
-              <Text style={styles.optionText}>{o.label}</Text>
-              {settings.autoLockMinutes === o.value ? (
-                <Ionicons name="checkmark" size={20} color={colors.brandPrimary} />
-              ) : null}
-            </Pressable>
-          ))}
-        </View>
-      </Modal>
 
       <ConfirmSheet
         visible={wipeConfirm}
@@ -238,8 +194,6 @@ const useStyles = makeStyles((colors) => ({
   rowLabelDanger: { color: colors.error },
   rowSubtitle: { color: colors.muted, fontFamily: fonts.regular, fontSize: 12, marginTop: 1 },
   divider: { height: 1, backgroundColor: colors.divider, marginLeft: 64 },
-  valuePill: { flexDirection: "row", alignItems: "center", gap: 2 },
-  valueText: { color: colors.brandSecondary, fontFamily: fonts.medium, fontSize: 14 },
   aboutCard: {
     flexDirection: "row",
     gap: 12,
@@ -249,28 +203,6 @@ const useStyles = makeStyles((colors) => ({
     marginTop: 20,
   },
   aboutText: { flex: 1, color: colors.brandPrimary, fontFamily: fonts.regular, fontSize: 13, lineHeight: 19 },
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)" },
-  sheet: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: colors.surfaceSecondary,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
-  },
-  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.borderStrong, alignSelf: "center", marginBottom: 12 },
-  sheetTitle: { color: colors.onSurface, fontFamily: fonts.bold, fontSize: 18, marginBottom: 8 },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.divider,
-  },
-  optionText: { color: colors.onSurface, fontFamily: fonts.medium, fontSize: 16 },
 }));
 
 function Divider() {

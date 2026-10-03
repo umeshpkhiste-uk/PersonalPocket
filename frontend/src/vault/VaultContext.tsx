@@ -14,7 +14,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { AppState, AppStateStatus, Platform } from "react-native";
+import { Platform } from "react-native";
 
 import { storage } from "@/src/utils/storage";
 import { genId } from "@/src/utils/format";
@@ -68,13 +68,11 @@ export type VaultStatus = "loading" | "needs_setup" | "locked" | "unlocked";
 
 export interface VaultSettings {
   biometricEnabled: boolean;
-  autoLockMinutes: number;
   screenshotProtection: boolean;
 }
 
 const DEFAULT_SETTINGS: VaultSettings = {
   biometricEnabled: true,
-  autoLockMinutes: 2,
   screenshotProtection: true,
 };
 
@@ -87,7 +85,6 @@ interface VaultContextValue {
   unlockWithPin: (pin: string) => Promise<boolean>;
   unlockWithBiometric: () => Promise<boolean>;
   lock: () => void;
-  recordActivity: () => void;
   getRecord: (category: Category, id: string) => VaultRecord | undefined;
   upsertRecord: (category: Category, record: VaultRecord) => Promise<void>;
   deleteRecord: (category: Category, id: string) => Promise<void>;
@@ -105,8 +102,6 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   const [biometricAvailable, setBiometricAvailable] = useState(false);
 
   const keyRef = useRef<string | null>(null);
-  const lastActivityRef = useRef<number>(Date.now());
-  const backgroundAtRef = useRef<number | null>(null);
   const settingsRef = useRef<VaultSettings>(DEFAULT_SETTINGS);
   settingsRef.current = settings;
 
@@ -210,7 +205,6 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
         await storage.secureSet(K_BIOKEY, key);
       }
 
-      lastActivityRef.current = Date.now();
       setStatus("unlocked");
     },
     [biometricAvailable, persistData, persistSettings],
@@ -222,7 +216,6 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       webSessionSetKey(key);
       const loaded = await loadData();
       setData(loaded);
-      lastActivityRef.current = Date.now();
       setStatus("unlocked");
     },
     [loadData],
@@ -259,44 +252,8 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     keyRef.current = null;
     webSessionSetKey(null);
     setData(null);
-    backgroundAtRef.current = null;
     setStatus((s) => (s === "unlocked" ? "locked" : s));
   }, []);
-
-  const recordActivity = useCallback(() => {
-    lastActivityRef.current = Date.now();
-  }, []);
-
-  // ---- auto-lock: idle timer ---------------------------------------------
-  useEffect(() => {
-    if (status !== "unlocked") return;
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - lastActivityRef.current;
-      if (elapsed >= settingsRef.current.autoLockMinutes * 60000) {
-        lock();
-      }
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [status, lock]);
-
-  // ---- auto-lock: background ----------------------------------------------
-  useEffect(() => {
-    const sub = AppState.addEventListener("change", (next: AppStateStatus) => {
-      if (next === "background" || next === "inactive") {
-        if (backgroundAtRef.current === null) backgroundAtRef.current = Date.now();
-      } else if (next === "active") {
-        const bg = backgroundAtRef.current;
-        backgroundAtRef.current = null;
-        if (bg !== null && status === "unlocked") {
-          const elapsed = Date.now() - bg;
-          if (elapsed >= settingsRef.current.autoLockMinutes * 60000) {
-            lock();
-          }
-        }
-      }
-    });
-    return () => sub.remove();
-  }, [status, lock]);
 
   // ---- CRUD ---------------------------------------------------------------
   const getRecord = useCallback(
@@ -406,7 +363,6 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     unlockWithPin,
     unlockWithBiometric,
     lock,
-    recordActivity,
     getRecord,
     upsertRecord,
     deleteRecord,
