@@ -8,6 +8,9 @@
 .emergent/
 .gitconfig
 
+# Claude Code local tooling state (not part of the app)
+.claude/
+
 # Dependencies
 node_modules/
 /node_modules

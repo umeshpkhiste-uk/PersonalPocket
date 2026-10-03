@@ -46,6 +46,7 @@ export default function Detail() {
 
   const summary = getSummary(category, record);
   const fields = getFields(category, record.subtype).filter((f) => {
+    if (category === "banking" && record.subtype === "account" && f.key === "balance") return false;
     const v = record[f.key];
     return v !== undefined && v !== null && String(v).trim() !== "";
   });
