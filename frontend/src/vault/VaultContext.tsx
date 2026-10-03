@@ -38,6 +38,31 @@ const K_VERIFIER = "pp_verifier";
 const K_BIOKEY = "pp_biokey";
 const K_DATA = "pp_data";
 const K_SETTINGS = "pp_settings";
+const K_WEB_SESSION = "pp_web_session_key";
+
+// Web only: a page refresh reruns the whole app, wiping keyRef (plain JS
+// memory) and forcing re-entry of the PIN. sessionStorage survives a refresh
+// but is cleared when the tab/browser closes, so we use it to carry the
+// unlocked key across refreshes within the same browser session only —
+// lock()/idle-timeout/wipeAll all clear it too. Native (iOS/Android) never
+// touches this; the in-memory-only key there is intentional and unaffected.
+function webSessionGetKey(): string | null {
+  if (Platform.OS !== "web" || typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage.getItem(K_WEB_SESSION) || null;
+  } catch {
+    return null;
+  }
+}
+function webSessionSetKey(key: string | null) {
+  if (Platform.OS !== "web" || typeof window === "undefined") return;
+  try {
+    if (key) window.sessionStorage.setItem(K_WEB_SESSION, key);
+    else window.sessionStorage.removeItem(K_WEB_SESSION);
+  } catch {
+    /* ignore (private browsing, storage disabled, etc.) */
+  }
+}
 
 export type VaultStatus = "loading" | "needs_setup" | "locked" | "unlocked";
 
@@ -104,7 +129,21 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       }
 
       const salt = await storage.secureGet<string>(K_SALT, "");
-      setStatus(salt ? "locked" : "needs_setup");
+      if (!salt) {
+        setStatus("needs_setup");
+        return;
+      }
+
+      const sessionKey = webSessionGetKey();
+      if (sessionKey) {
+        const verifier = await storage.secureGet<string>(K_VERIFIER, "");
+        if (verifier && sha256(sessionKey) === verifier) {
+          await finishUnlock(sessionKey);
+          return;
+        }
+        webSessionSetKey(null); // stale/invalid — don't trust it
+      }
+      setStatus("locked");
     })();
   }, []);
 
@@ -152,6 +191,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       const salt = await randomHex(16);
       const key = deriveKey(pin, salt);
       keyRef.current = key;
+      webSessionSetKey(key);
 
       await storage.secureSet(K_SALT, salt);
       await storage.secureSet(K_VERIFIER, sha256(key));
@@ -179,6 +219,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   const finishUnlock = useCallback(
     async (key: string) => {
       keyRef.current = key;
+      webSessionSetKey(key);
       const loaded = await loadData();
       setData(loaded);
       lastActivityRef.current = Date.now();
@@ -216,6 +257,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
   const lock = useCallback(() => {
     keyRef.current = null;
+    webSessionSetKey(null);
     setData(null);
     backgroundAtRef.current = null;
     setStatus((s) => (s === "unlocked" ? "locked" : s));
@@ -349,6 +391,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       storage.removeItem(K_SETTINGS),
     ]);
     keyRef.current = null;
+    webSessionSetKey(null);
     setData(null);
     setSettings(DEFAULT_SETTINGS);
     setStatus("needs_setup");
