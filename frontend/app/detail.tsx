@@ -13,6 +13,7 @@ import { formatCurrency, formatDate, initials } from "@/src/utils/format";
 import {
   CATEGORY_META,
   Category,
+  CustomField,
   getFields,
   getSummary,
   subtypeLabel,
@@ -115,6 +116,9 @@ export default function Detail() {
               secret={f.type === "secret"}
               multiline={f.type === "multiline"}
             />
+          ))}
+          {(record.customFields as CustomField[] | undefined)?.map((f) => (
+            <DetailRow key={f.key} label={f.label || "Field"} value={f.value} />
           ))}
         </View>
 

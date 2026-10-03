@@ -30,6 +30,14 @@ export interface FieldDef {
   options?: { label: string; value: string }[];
 }
 
+// User-defined fields added on top of a record's fixed schema fields.
+// Stored on the record under the "customFields" key.
+export interface CustomField {
+  key: string;
+  label: string;
+  value: string;
+}
+
 export interface SubtypeDef {
   value: string;
   label: string;
@@ -83,18 +91,24 @@ const FREQUENCY_OPTIONS = [
   { label: "Weekly", value: "Weekly" },
 ];
 
-const NOTES: FieldDef = { key: "notes", label: "Notes", type: "multiline", optional: true };
+const NOTES: FieldDef = {
+  key: "notes",
+  label: "Notes",
+  type: "multiline",
+  optional: true,
+  placeholder: "Add any extra details worth remembering",
+};
 
 export function getFields(category: Category, subtype?: string): FieldDef[] {
   if (category === "credentials") {
     return [
       { key: "serviceName", label: "Service or Institution", type: "text", placeholder: "e.g. HDFC NetBanking" },
       { key: "username", label: "Email or Username", type: "text", optional: true, placeholder: "name@email.com" },
-      { key: "password", label: "Password", type: "secret", optional: true },
-      { key: "password2", label: "Secondary Password", type: "secret", optional: true },
-      { key: "mpin", label: "MPIN", type: "secret", optional: true },
-      { key: "tpin", label: "TPIN", type: "secret", optional: true },
-      { key: "pattern", label: "Mobile Lock Pattern", type: "secret", optional: true },
+      { key: "password", label: "Password", type: "secret", optional: true, placeholder: "Enter password" },
+      { key: "password2", label: "Secondary Password", type: "secret", optional: true, placeholder: "Enter secondary password" },
+      { key: "mpin", label: "MPIN", type: "secret", optional: true, placeholder: "4–6 digit MPIN" },
+      { key: "tpin", label: "TPIN", type: "secret", optional: true, placeholder: "Transaction PIN" },
+      { key: "pattern", label: "Mobile Lock Pattern", type: "secret", optional: true, placeholder: "Describe your unlock pattern" },
       NOTES,
     ];
   }
@@ -112,38 +126,38 @@ export function getFields(category: Category, subtype?: string): FieldDef[] {
             { label: "Current", value: "Current" },
           ],
         },
-        { key: "accountNumber", label: "Account Number", type: "secret", optional: true },
-        { key: "holderName", label: "Account Holder", type: "text", optional: true },
-        { key: "ifsc", label: "IFSC / Branch Code", type: "text", optional: true },
-        { key: "nominee", label: "Nominee", type: "text", optional: true },
+        { key: "accountNumber", label: "Account Number", type: "secret", optional: true, placeholder: "Enter account number" },
+        { key: "holderName", label: "Account Holder", type: "text", optional: true, placeholder: "Full name as per bank records" },
+        { key: "ifsc", label: "IFSC / Branch Code", type: "text", optional: true, placeholder: "e.g. SBIN0001234" },
+        { key: "nominee", label: "Nominee", type: "text", optional: true, placeholder: "Nominee's full name" },
         NOTES,
       ];
     }
     if (subtype === "fd" || subtype === "rd") {
       const principalLabel = subtype === "rd" ? "Monthly Deposit" : "Principal Amount";
       return [
-        { key: "institution", label: "Bank / Institution", type: "text" },
-        { key: "referenceNumber", label: "Reference Number", type: "secret", optional: true },
-        { key: "holderName", label: "Holder Name", type: "text", optional: true },
-        { key: "principal", label: principalLabel, type: "number", optional: true },
-        { key: "interestRate", label: "Interest Rate (%)", type: "number", optional: true },
+        { key: "institution", label: "Bank / Institution", type: "text", placeholder: "e.g. State Bank" },
+        { key: "referenceNumber", label: "Reference Number", type: "secret", optional: true, placeholder: `${subtype === "rd" ? "RD" : "FD"} account / receipt number` },
+        { key: "holderName", label: "Holder Name", type: "text", optional: true, placeholder: "Full name as per bank records" },
+        { key: "principal", label: principalLabel, type: "number", optional: true, placeholder: "Enter amount" },
+        { key: "interestRate", label: "Interest Rate (%)", type: "number", optional: true, placeholder: "e.g. 7.5" },
         { key: "startDate", label: "Start Date", type: "date", optional: true },
         { key: "maturityDate", label: "Maturity Date", type: "date", optional: true },
         { key: "tenure", label: "Tenure", type: "text", optional: true, placeholder: "e.g. 24 months" },
-        { key: "nominee", label: "Nominee", type: "text", optional: true },
+        { key: "nominee", label: "Nominee", type: "text", optional: true, placeholder: "Nominee's full name" },
         NOTES,
       ];
     }
     // other deposit
     return [
-      { key: "institution", label: "Institution", type: "text" },
-      { key: "referenceNumber", label: "Reference Number", type: "secret", optional: true },
-      { key: "holderName", label: "Holder Name", type: "text", optional: true },
-      { key: "principal", label: "Amount", type: "number", optional: true },
-      { key: "interestRate", label: "Interest Rate (%)", type: "number", optional: true },
+      { key: "institution", label: "Institution", type: "text", placeholder: "e.g. Post Office" },
+      { key: "referenceNumber", label: "Reference Number", type: "secret", optional: true, placeholder: "Account / certificate number" },
+      { key: "holderName", label: "Holder Name", type: "text", optional: true, placeholder: "Full name as per records" },
+      { key: "principal", label: "Amount", type: "number", optional: true, placeholder: "Enter amount" },
+      { key: "interestRate", label: "Interest Rate (%)", type: "number", optional: true, placeholder: "e.g. 7.5" },
       { key: "startDate", label: "Start Date", type: "date", optional: true },
       { key: "maturityDate", label: "Maturity Date", type: "date", optional: true },
-      { key: "nominee", label: "Nominee", type: "text", optional: true },
+      { key: "nominee", label: "Nominee", type: "text", optional: true, placeholder: "Nominee's full name" },
       NOTES,
     ];
   }
@@ -152,26 +166,33 @@ export function getFields(category: Category, subtype?: string): FieldDef[] {
     if (subtype === "shares") {
       return [
         { key: "broker", label: "Broker", type: "text", placeholder: "e.g. Zerodha" },
-        { key: "instrument", label: "Stock / Instrument", type: "text", optional: true },
-        { key: "reference", label: "Demat / Ref Number", type: "secret", optional: true },
-        { key: "units", label: "Quantity", type: "number", optional: true },
-        { key: "amount", label: "Invested Value", type: "number", optional: true },
-        { key: "currentValue", label: "Current Value", type: "number", optional: true },
+        { key: "instrument", label: "Stock / Instrument", type: "text", optional: true, placeholder: "e.g. RELIANCE, TCS" },
+        { key: "reference", label: "Demat / Ref Number", type: "secret", optional: true, placeholder: "Demat account number" },
+        { key: "units", label: "Quantity", type: "number", optional: true, placeholder: "Number of shares held" },
+        { key: "amount", label: "Invested Value", type: "number", optional: true, placeholder: "Total amount invested" },
+        { key: "currentValue", label: "Current Value", type: "number", optional: true, placeholder: "Current market value" },
         { key: "startDate", label: "Purchase Date", type: "date", optional: true },
         NOTES,
       ];
     }
     const fields: FieldDef[] = [
       { key: "provider", label: "Provider / AMC", type: "text", placeholder: "e.g. Axis Mutual Fund" },
-      { key: "scheme", label: "Scheme / Instrument", type: "text", optional: true },
-      { key: "reference", label: "Folio / Ref Number", type: "secret", optional: true },
-      { key: "amount", label: subtype === "swp" ? "Withdrawal Amount" : "Amount", type: "number", optional: true },
+      { key: "scheme", label: "Scheme / Instrument", type: "text", optional: true, placeholder: "e.g. Axis Bluechip Fund" },
+      { key: "reference", label: "Folio / Ref Number", type: "secret", optional: true, placeholder: "Folio number" },
+      {
+        key: "amount",
+        label: subtype === "swp" ? "Withdrawal Amount" : "Amount",
+        type: "number",
+        optional: true,
+        placeholder: subtype === "swp" ? "Amount withdrawn per cycle" : "Enter amount",
+      },
     ];
-    if (subtype === "mutual_fund") fields.push({ key: "units", label: "Units", type: "number", optional: true });
+    if (subtype === "mutual_fund")
+      fields.push({ key: "units", label: "Units", type: "number", optional: true, placeholder: "Units held" });
     if (subtype === "sip" || subtype === "swp")
       fields.push({ key: "frequency", label: "Frequency", type: "select", options: FREQUENCY_OPTIONS });
     fields.push({ key: "startDate", label: "Start Date", type: "date", optional: true });
-    fields.push({ key: "currentValue", label: "Current Value", type: "number", optional: true });
+    fields.push({ key: "currentValue", label: "Current Value", type: "number", optional: true, placeholder: "Current market value" });
     fields.push(NOTES);
     return fields;
   }
@@ -179,11 +200,11 @@ export function getFields(category: Category, subtype?: string): FieldDef[] {
   // loans
   return [
     { key: "lender", label: "Lender", type: "text", placeholder: "e.g. HDFC Bank" },
-    { key: "reference", label: "Loan Reference", type: "secret", optional: true },
-    { key: "principal", label: "Principal Amount", type: "number", optional: true },
-    { key: "outstanding", label: "Outstanding Amount", type: "number", optional: true },
-    { key: "interestRate", label: "Interest Rate (%)", type: "number", optional: true },
-    { key: "emi", label: "EMI Amount", type: "number", optional: true },
+    { key: "reference", label: "Loan Reference", type: "secret", optional: true, placeholder: "Loan account number" },
+    { key: "principal", label: "Principal Amount", type: "number", optional: true, placeholder: "Total loan amount" },
+    { key: "outstanding", label: "Outstanding Amount", type: "number", optional: true, placeholder: "Remaining amount to pay" },
+    { key: "interestRate", label: "Interest Rate (%)", type: "number", optional: true, placeholder: "e.g. 9.5" },
+    { key: "emi", label: "EMI Amount", type: "number", optional: true, placeholder: "Monthly EMI amount" },
     { key: "frequency", label: "Payment Frequency", type: "select", optional: true, options: FREQUENCY_OPTIONS },
     { key: "startDate", label: "Start Date", type: "date", optional: true },
     { key: "endDate", label: "Expected End Date", type: "date", optional: true },

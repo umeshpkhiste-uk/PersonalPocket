@@ -6,6 +6,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 
+import { CustomFieldRow } from "@/src/components/CustomFieldRow";
 import { Field } from "@/src/components/Field";
 import { useToast } from "@/src/components/Toast";
 import { fonts } from "@/src/typography";
@@ -14,6 +15,7 @@ import { genId } from "@/src/utils/format";
 import {
   CATEGORY_META,
   Category,
+  CustomField,
   getFields,
   SUBTYPES,
   VaultRecord,
@@ -39,18 +41,26 @@ export default function Form() {
     const init: Record<string, string> = {};
     if (existing) {
       for (const [k, v] of Object.entries(existing)) {
-        if (["id", "createdAt", "updatedAt", "subtype"].includes(k)) continue;
+        if (["id", "createdAt", "updatedAt", "subtype", "customFields"].includes(k)) continue;
         init[k] = v == null ? "" : String(v);
       }
     }
     return init;
   });
+  const [customFields, setCustomFields] = useState<CustomField[]>(
+    () => existing?.customFields ?? [],
+  );
   const [touchedSave, setTouchedSave] = useState(false);
 
   const fields = useMemo(() => getFields(category, subtype), [category, subtype]);
   const requiredKey = fields[0].key;
 
   const setValue = (key: string, value: string) => setValues((p) => ({ ...p, [key]: value }));
+
+  const addCustomField = () => setCustomFields((p) => [...p, { key: genId(), label: "", value: "" }]);
+  const updateCustomField = (key: string, patch: Partial<Pick<CustomField, "label" | "value">>) =>
+    setCustomFields((p) => p.map((f) => (f.key === key ? { ...f, ...patch } : f)));
+  const removeCustomField = (key: string) => setCustomFields((p) => p.filter((f) => f.key !== key));
 
   const save = () => {
     setTouchedSave(true);
@@ -68,6 +78,10 @@ export default function Form() {
       const v = values[f.key];
       if (v !== undefined && v !== "") record[f.key] = v;
     }
+    const cleanedCustomFields = customFields
+      .map((f) => ({ ...f, label: f.label.trim(), value: f.value.trim() }))
+      .filter((f) => f.label !== "" || f.value !== "");
+    if (cleanedCustomFields.length) record.customFields = cleanedCustomFields;
     upsertRecord(category, record);
     if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     toast.show(editing ? `${meta.singular} updated` : `${meta.singular} added`, "success");
@@ -125,6 +139,22 @@ export default function Form() {
             />
           ))}
         </View>
+
+        <View style={styles.customSection}>
+          <Text style={styles.typeLabel}>Custom Fields</Text>
+          {customFields.map((f) => (
+            <CustomFieldRow
+              key={f.key}
+              field={f}
+              onChange={(patch) => updateCustomField(f.key, patch)}
+              onRemove={() => removeCustomField(f.key)}
+            />
+          ))}
+          <Pressable onPress={addCustomField} style={styles.addFieldBtn} testID="add-custom-field">
+            <Ionicons name="add-circle-outline" size={18} color={colors.brandPrimary} />
+            <Text style={styles.addFieldText}>Add Field</Text>
+          </Pressable>
+        </View>
       </KeyboardAwareScrollView>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
@@ -169,6 +199,19 @@ const useStyles = makeStyles((colors) => ({
   typeChipText: { color: colors.onSurfaceTertiary, fontFamily: fonts.medium, fontSize: 14 },
   typeChipTextActive: { color: colors.onBrandPrimary },
   fields: { gap: 16 },
+  customSection: { gap: 12 },
+  addFieldBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderStyle: "dashed",
+  },
+  addFieldText: { color: colors.brandPrimary, fontFamily: fonts.semibold, fontSize: 14 },
   footer: {
     paddingHorizontal: 16,
     paddingTop: 12,
