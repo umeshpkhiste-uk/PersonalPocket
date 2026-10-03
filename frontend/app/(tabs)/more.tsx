@@ -16,7 +16,7 @@ const AUTO_LOCK_OPTIONS = [
   { label: "10 minutes", value: 10 },
 ];
 
-export default function More() {
+export default function Settings() {
   const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -42,7 +42,7 @@ export default function More() {
   return (
     <View style={styles.screen}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Text style={styles.title}>More</Text>
+        <Text style={styles.title}>Settings</Text>
       </View>
 
       <ScrollView

@@ -30,8 +30,8 @@ export default function TabsLayout() {
           <NativeTabs.Trigger.Label>Loans</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="more">
-          <NativeTabs.Trigger.Icon sf="ellipsis.circle.fill" />
-          <NativeTabs.Trigger.Label>More</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf="gearshape.fill" />
+          <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
       </NativeTabs>
     );
@@ -59,7 +59,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="banking" options={{ title: "Banking", tabBarIcon: icon("business-outline") }} />
       <Tabs.Screen name="investments" options={{ title: "Investments", tabBarIcon: icon("trending-up-outline") }} />
       <Tabs.Screen name="loans" options={{ title: "Loans", tabBarIcon: icon("cash-outline") }} />
-      <Tabs.Screen name="more" options={{ title: "More", tabBarIcon: icon("ellipsis-horizontal") }} />
+      <Tabs.Screen name="more" options={{ title: "Settings", tabBarIcon: icon("settings-outline") }} />
     </Tabs>
   );
 }
