@@ -114,7 +114,6 @@ export function getFields(category: Category, subtype?: string): FieldDef[] {
         },
         { key: "accountNumber", label: "Account Number", type: "secret", optional: true },
         { key: "holderName", label: "Account Holder", type: "text", optional: true },
-        { key: "balance", label: "Current Balance", type: "number", optional: true },
         { key: "ifsc", label: "IFSC / Branch Code", type: "text", optional: true },
         { key: "nominee", label: "Nominee", type: "text", optional: true },
         NOTES,
