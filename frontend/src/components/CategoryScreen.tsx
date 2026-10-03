@@ -34,7 +34,7 @@ function searchableText(category: Category, rec: VaultRecord): string {
   return parts.join(" ").toLowerCase();
 }
 
-export function CategoryScreen({ category }: { category: Category }) {
+export function CategoryScreen({ category, showBack }: { category: Category; showBack?: boolean }) {
   const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -42,7 +42,9 @@ export function CategoryScreen({ category }: { category: Category }) {
   const meta = CATEGORY_META[category];
   const subtypes = SUBTYPES[category];
 
-  const bottomChrome = usesNativeTabs ? insets.bottom : 0;
+  // Outside the tab navigator (showBack) there's no tab bar eating into the
+  // bottom inset, so use it directly instead of the tab-bar-aware offsets.
+  const bottomChrome = showBack ? insets.bottom : usesNativeTabs ? insets.bottom : 0;
 
   const [query, setQuery] = useState("");
   const [subtype, setSubtype] = useState<string>("all");
@@ -72,7 +74,12 @@ export function CategoryScreen({ category }: { category: Category }) {
     <View style={styles.screen}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <View style={styles.titleRow}>
-          <Text style={styles.title}>{meta.title}</Text>
+          {showBack ? (
+            <Pressable onPress={() => router.back()} style={styles.lockBtn} hitSlop={8} testID="category-back">
+              <Ionicons name="chevron-back" size={22} color={colors.onSurface} />
+            </Pressable>
+          ) : null}
+          <Text style={[styles.title, showBack && styles.titleWithBack]}>{meta.title}</Text>
           <Pressable onPress={lock} style={styles.lockBtn} hitSlop={8} testID="lock-button">
             <Ionicons name="lock-closed-outline" size={20} color={colors.brandPrimary} />
           </Pressable>
@@ -119,7 +126,15 @@ export function CategoryScreen({ category }: { category: Category }) {
         onPress={addRecord}
         style={[
           styles.fab,
-          { bottom: usesNativeTabs ? insets.bottom + 16 : Platform.OS === "web" ? 16 + 64 : 16 },
+          {
+            bottom: showBack
+              ? insets.bottom + 16
+              : usesNativeTabs
+                ? insets.bottom + 16
+                : Platform.OS === "web"
+                  ? 16 + 64
+                  : 16,
+          },
         ]}
         testID="add-record-fab"
       >
@@ -132,8 +147,9 @@ export function CategoryScreen({ category }: { category: Category }) {
 const useStyles = makeStyles((colors) => ({
   screen: { flex: 1, backgroundColor: colors.surface },
   header: { paddingHorizontal: 16, paddingBottom: 12, gap: 14, backgroundColor: colors.surface },
-  titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
   title: { color: colors.onSurface, fontFamily: fonts.bold, fontSize: 30 },
+  titleWithBack: { flex: 1, fontSize: 22 },
   lockBtn: {
     width: 40,
     height: 40,

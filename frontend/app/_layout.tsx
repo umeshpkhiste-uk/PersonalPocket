@@ -28,7 +28,7 @@ function LockGate() {
     if (status === "loading") return;
 
     const root = segments[0];
-    const inApp = root === "(tabs)" || root === "detail" || root === "form";
+    const inApp = root === "(tabs)" || root === "detail" || root === "form" || root === "category";
 
     if (status === "needs_setup" && root !== "setup") {
       router.replace("/setup");
@@ -52,6 +52,7 @@ function RootNavigator() {
         <Stack.Screen name="unlock" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="detail" />
+        <Stack.Screen name="category" />
         <Stack.Screen name="form" options={{ presentation: "modal" }} />
       </Stack>
       <LockGate />

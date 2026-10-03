@@ -14,6 +14,10 @@ export default function TabsLayout() {
     return (
       <NativeTabs>
         <NativeTabs.Trigger name="index">
+          <NativeTabs.Trigger.Icon sf="house.fill" />
+          <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="credentials">
           <NativeTabs.Trigger.Icon sf="key.fill" />
           <NativeTabs.Trigger.Label>Credentials</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
@@ -55,7 +59,8 @@ export default function TabsLayout() {
         tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 11 },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: "Credentials", tabBarIcon: icon("key-outline") }} />
+      <Tabs.Screen name="index" options={{ title: "Home", tabBarIcon: icon("home-outline") }} />
+      <Tabs.Screen name="credentials" options={{ title: "Credentials", tabBarIcon: icon("key-outline") }} />
       <Tabs.Screen name="banking" options={{ title: "Banking", tabBarIcon: icon("business-outline") }} />
       <Tabs.Screen name="investments" options={{ title: "Investments", tabBarIcon: icon("trending-up-outline") }} />
       <Tabs.Screen name="loans" options={{ title: "Loans", tabBarIcon: icon("cash-outline") }} />

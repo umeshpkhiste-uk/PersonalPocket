@@ -174,6 +174,10 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
         banking: parsed.banking ?? [],
         investments: parsed.investments ?? [],
         loans: parsed.loans ?? [],
+        notes: parsed.notes ?? [],
+        api_keys: parsed.api_keys ?? [],
+        identity: parsed.identity ?? [],
+        licenses: parsed.licenses ?? [],
       };
     } catch {
       return emptyData();

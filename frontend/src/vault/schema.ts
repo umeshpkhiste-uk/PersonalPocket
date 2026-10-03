@@ -2,7 +2,15 @@
 
 import { genId } from "@/src/utils/format";
 
-export type Category = "credentials" | "banking" | "investments" | "loans";
+export type Category =
+  | "credentials"
+  | "banking"
+  | "investments"
+  | "loans"
+  | "notes"
+  | "api_keys"
+  | "identity"
+  | "licenses";
 
 export interface VaultRecord {
   id: string;
@@ -17,6 +25,10 @@ export interface VaultData {
   banking: VaultRecord[];
   investments: VaultRecord[];
   loans: VaultRecord[];
+  notes: VaultRecord[];
+  api_keys: VaultRecord[];
+  identity: VaultRecord[];
+  licenses: VaultRecord[];
 }
 
 export type FieldType = "text" | "number" | "secret" | "date" | "select" | "multiline";
@@ -52,6 +64,10 @@ export const CATEGORY_META: Record<
   banking: { title: "Banking", singular: "Bank Record", icon: "business-outline" },
   investments: { title: "Investments", singular: "Investment", icon: "trending-up-outline" },
   loans: { title: "Loans", singular: "Loan", icon: "cash-outline" },
+  notes: { title: "Secure Notes", singular: "Note", icon: "document-text-outline" },
+  api_keys: { title: "API & SSH Keys", singular: "Key", icon: "code-slash-outline" },
+  identity: { title: "Identity & IDs", singular: "ID", icon: "person-circle-outline" },
+  licenses: { title: "Software Licenses", singular: "License", icon: "ribbon-outline" },
 };
 
 export const SUBTYPES: Record<Category, SubtypeDef[]> = {
@@ -76,6 +92,10 @@ export const SUBTYPES: Record<Category, SubtypeDef[]> = {
     { value: "education", label: "Education", icon: "school-outline" },
     { value: "other", label: "Other", icon: "ellipsis-horizontal-circle-outline" },
   ],
+  notes: [],
+  api_keys: [],
+  identity: [],
+  licenses: [],
 };
 
 export function subtypeLabel(category: Category, value?: string): string {
@@ -197,18 +217,78 @@ export function getFields(category: Category, subtype?: string): FieldDef[] {
     return fields;
   }
 
-  // loans
+  if (category === "loans") {
+    return [
+      { key: "lender", label: "Lender", type: "text", placeholder: "e.g. HDFC Bank" },
+      { key: "reference", label: "Loan Reference", type: "secret", optional: true, placeholder: "Loan account number" },
+      { key: "principal", label: "Principal Amount", type: "number", optional: true, placeholder: "Total loan amount" },
+      { key: "outstanding", label: "Outstanding Amount", type: "number", optional: true, placeholder: "Remaining amount to pay" },
+      { key: "interestRate", label: "Interest Rate (%)", type: "number", optional: true, placeholder: "e.g. 9.5" },
+      { key: "emi", label: "EMI Amount", type: "number", optional: true, placeholder: "Monthly EMI amount" },
+      { key: "frequency", label: "Payment Frequency", type: "select", optional: true, options: FREQUENCY_OPTIONS },
+      { key: "startDate", label: "Start Date", type: "date", optional: true },
+      { key: "endDate", label: "Expected End Date", type: "date", optional: true },
+      { key: "nextPaymentDate", label: "Next Payment Date", type: "date", optional: true },
+      NOTES,
+    ];
+  }
+
+  if (category === "notes") {
+    return [
+      { key: "title", label: "Title", type: "text", placeholder: "e.g. Wi-Fi Password, Recovery Seed" },
+      { key: "content", label: "Content", type: "multiline", optional: true, placeholder: "Enter the note content" },
+    ];
+  }
+
+  if (category === "api_keys") {
+    return [
+      { key: "serviceName", label: "Service / Server", type: "text", placeholder: "e.g. OpenAI, AWS Prod" },
+      {
+        key: "keyType",
+        label: "Key Type",
+        type: "select",
+        options: [
+          { label: "API Key", value: "API Key" },
+          { label: "SSH Private Key", value: "SSH Private Key" },
+          { label: "SSH Public Key", value: "SSH Public Key" },
+          { label: "Access Token", value: "Access Token" },
+        ],
+      },
+      { key: "keyValue", label: "Key / Token", type: "secret", optional: true, placeholder: "Paste the key or token" },
+      { key: "environment", label: "Environment", type: "text", optional: true, placeholder: "e.g. Production, Staging" },
+      NOTES,
+    ];
+  }
+
+  if (category === "identity") {
+    return [
+      {
+        key: "idType",
+        label: "ID Type",
+        type: "select",
+        options: [
+          { label: "Passport", value: "Passport" },
+          { label: "Driving License", value: "Driving License" },
+          { label: "National ID", value: "National ID" },
+          { label: "Tax ID", value: "Tax ID" },
+          { label: "Other", value: "Other" },
+        ],
+      },
+      { key: "fullName", label: "Full Name", type: "text", placeholder: "As shown on the document" },
+      { key: "idNumber", label: "ID Number", type: "secret", optional: true, placeholder: "Enter ID number" },
+      { key: "issueDate", label: "Issue Date", type: "date", optional: true },
+      { key: "expiryDate", label: "Expiry Date", type: "date", optional: true },
+      NOTES,
+    ];
+  }
+
+  // licenses
   return [
-    { key: "lender", label: "Lender", type: "text", placeholder: "e.g. HDFC Bank" },
-    { key: "reference", label: "Loan Reference", type: "secret", optional: true, placeholder: "Loan account number" },
-    { key: "principal", label: "Principal Amount", type: "number", optional: true, placeholder: "Total loan amount" },
-    { key: "outstanding", label: "Outstanding Amount", type: "number", optional: true, placeholder: "Remaining amount to pay" },
-    { key: "interestRate", label: "Interest Rate (%)", type: "number", optional: true, placeholder: "e.g. 9.5" },
-    { key: "emi", label: "EMI Amount", type: "number", optional: true, placeholder: "Monthly EMI amount" },
-    { key: "frequency", label: "Payment Frequency", type: "select", optional: true, options: FREQUENCY_OPTIONS },
-    { key: "startDate", label: "Start Date", type: "date", optional: true },
-    { key: "endDate", label: "Expected End Date", type: "date", optional: true },
-    { key: "nextPaymentDate", label: "Next Payment Date", type: "date", optional: true },
+    { key: "softwareName", label: "Software", type: "text", placeholder: "e.g. JetBrains, Figma, Ableton Live" },
+    { key: "licenseKey", label: "License Key", type: "secret", optional: true, placeholder: "Enter license key" },
+    { key: "licensedTo", label: "Licensed To", type: "text", optional: true, placeholder: "Name or email" },
+    { key: "purchaseDate", label: "Purchase Date", type: "date", optional: true },
+    { key: "expiryDate", label: "Expiry / Renewal Date", type: "date", optional: true },
     NOTES,
   ];
 }
@@ -217,7 +297,11 @@ export function requiredKey(category: Category): string {
   if (category === "credentials") return "serviceName";
   if (category === "banking") return "institution";
   if (category === "investments") return "provider"; // shares uses broker; handled in form
-  return "lender";
+  if (category === "loans") return "lender";
+  if (category === "notes") return "title";
+  if (category === "api_keys") return "serviceName";
+  if (category === "identity") return "fullName";
+  return "softwareName"; // licenses
 }
 
 export interface RecordSummary {
@@ -258,13 +342,26 @@ export function getSummary(category: Category, rec: VaultRecord): RecordSummary 
       amountLabel: rec.currentValue ? "Value" : "Amount",
     };
   }
-  return {
-    title: rec.lender || "Lender",
-    subtitle: subtypeLabel("loans", rec.subtype),
-    amount: toNum(rec.outstanding) ?? toNum(rec.principal),
-    amountLabel: "Outstanding",
-    negative: true,
-  };
+  if (category === "loans") {
+    return {
+      title: rec.lender || "Lender",
+      subtitle: subtypeLabel("loans", rec.subtype),
+      amount: toNum(rec.outstanding) ?? toNum(rec.principal),
+      amountLabel: "Outstanding",
+      negative: true,
+    };
+  }
+  if (category === "notes") {
+    return { title: rec.title || "Untitled", subtitle: rec.content ? "Note" : "Empty note" };
+  }
+  if (category === "api_keys") {
+    return { title: rec.serviceName || "Untitled", subtitle: rec.keyType || rec.environment || "Key" };
+  }
+  if (category === "identity") {
+    return { title: rec.fullName || "Untitled", subtitle: rec.idType || "ID" };
+  }
+  // licenses
+  return { title: rec.softwareName || "Untitled", subtitle: rec.licensedTo || "License" };
 }
 
 function toNum(v: any): number | undefined {
@@ -354,9 +451,54 @@ export function buildSampleData(): VaultData {
         emi: 15800, frequency: "Monthly", nextPaymentDate: stamp(-5),
       },
     ],
+    notes: [
+      {
+        id: genId(), createdAt: now, updatedAt: now,
+        title: "Wi-Fi Password", content: "Sample-Network: Demo@WiFi123",
+      },
+      {
+        id: genId(), createdAt: now, updatedAt: now,
+        title: "Recovery Seed (sample)", content: "example apple banana cherry demo fake seed words only",
+      },
+    ],
+    api_keys: [
+      {
+        id: genId(), createdAt: now, updatedAt: now,
+        serviceName: "Sample API", keyType: "API Key",
+        keyValue: "sk-demo-0000000000000000", environment: "Production",
+      },
+      {
+        id: genId(), createdAt: now, updatedAt: now,
+        serviceName: "Demo Server SSH", keyType: "SSH Private Key",
+        keyValue: "-----BEGIN DEMO KEY-----", environment: "Staging",
+      },
+    ],
+    identity: [
+      {
+        id: genId(), createdAt: now, updatedAt: now,
+        idType: "Passport", fullName: "Demo User",
+        idNumber: "X0000000", expiryDate: stamp(-1800),
+      },
+    ],
+    licenses: [
+      {
+        id: genId(), createdAt: now, updatedAt: now,
+        softwareName: "Sample IDE", licenseKey: "DEMO-0000-0000-0000",
+        licensedTo: "demo.user@example.com",
+      },
+    ],
   };
 }
 
 export function emptyData(): VaultData {
-  return { credentials: [], banking: [], investments: [], loans: [] };
+  return {
+    credentials: [],
+    banking: [],
+    investments: [],
+    loans: [],
+    notes: [],
+    api_keys: [],
+    identity: [],
+    licenses: [],
+  };
 }
